@@ -4,7 +4,7 @@ import logging
 import config
 import recipes
 from api import Commerce
-from material import CraftingMaterial
+from material import CraftingMaterial, Seed
 
 RARITIES = ['fine', 'masterwork', 'rare', 'exotic']
 
@@ -31,12 +31,24 @@ def main():
                                                                                   cheapest_nourishments[1][3],
                                                                                   cheapest_nourishments[2][3],
                                                                                   cheapest_nourishments[3][3])
-    logging.info(f'An Exquisite Extract of Nourishment would thus cost {pretty_print_coins(exquisite_extract_price)}')
+    logging.info(f'An Exquisite Extract of Nourishment would thus cost {config.format_coins(exquisite_extract_price)}')
     enriched_compost_price = recipes.calc_price_enriched_compost(exquisite_extract_price)
-    logging.info(f'A Pile of Enriched Compost would thus cost {pretty_print_coins(enriched_compost_price)}')
+    logging.info(f'A Pile of Enriched Compost would thus cost {config.format_coins(enriched_compost_price)}')
 
-    # Find best seed
+    # Find most profitable seed
     seeds = collect_seed_prices()
+    profitable_seed = None
+    profit_seed = 0
+    for seed in seeds:
+        print(f'{seed.harvest_price} * {config.TP_TAX} - {seed.seed_price} - {enriched_compost_price}')
+        profit = seed.harvest_price * config.TP_TAX - seed.seed_price - enriched_compost_price
+        logging.info(str(seed) + ' = ' + str(profit))
+        if profit_seed < profit:
+            profit_seed = profit
+            profitable_seed = seed
+
+    print(profitable_seed)
+
 
 
 def collect_material_prices():
@@ -70,16 +82,23 @@ def find_cheapest_nourishments(material_all_prices):
 
 
 def collect_seed_prices():
-    pass
+    seeds = []
+    commerce = Commerce()
+    with open('seeds.csv', 'r') as seed_list:
+        for row in csv.reader(seed_list, delimiter=";"):
+            commerce.ids.append(row[2])
+            commerce.ids.append(row[4])
+            seeds.append(Seed(row[0], row[1], row[2], row[3], row[4], row[5]))
+    seed_prices = commerce.get_prices()
+    for i, seed in enumerate(seeds):
+        seed.seed_price = seed_prices[i * 2]['sells']['unit_price']
+        seed.harvest_price = seed_prices[i * 2 + 1]['sells']['unit_price']
+    return seeds
 
 
 def log_cheapest_materials(index, materials, cheapest_nourishments):
     logging.info(
-        f'Cheapest {RARITIES[index]}:\t{materials[cheapest_nourishments[index][2]].name} for {pretty_print_coins(cheapest_nourishments[index][3])} each')
-
-
-def pretty_print_coins(amount):
-    return f'{round(amount // 10000)}g {round(amount // 100 % 100)}s {round(amount % 100)}c'
+        f'Cheapest {RARITIES[index]}:\t{materials[cheapest_nourishments[index][2]].name} for {config.format_coins(cheapest_nourishments[index][3])} each')
 
 
 if __name__ == '__main__':
