@@ -64,7 +64,8 @@ def collect_material_prices():
     # with timebudget("Collecting material prices"):
     commerce = Commerce()
     materials = []
-    with open('materials.csv', 'r') as material_list:
+    with open('resources/materials.csv', 'r') as material_list:
+        next(material_list)  # Skip first line
         for row in csv.reader(material_list, delimiter=";"):
             commerce.ids.append(row[0])
             materials.append(CraftingMaterial(row[0], row[1], row[2], row[3], row[4], row[5]))
@@ -102,7 +103,8 @@ def collect_seed_prices():
     """
     seeds = []
     commerce = Commerce()
-    with open('seeds.csv', 'r') as seed_list:
+    with open('resources/seeds.csv', 'r') as seed_list:
+        next(seed_list)  # Skip first line
         for row in csv.reader(seed_list, delimiter=";"):
             commerce.ids.append(row[2])
             commerce.ids.append(row[4])
