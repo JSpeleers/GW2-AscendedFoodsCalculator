@@ -1,6 +1,6 @@
 # GW2-AscendedFoodsCalculator
 
-Another GuildWars2 calculator to see if you can earn a little more money, doing the bare minimum. 
+Another GuildWars2 calculator to see if you can earn a little more in-game money, doing the bare minimum. 
 
 This little Python script will use the GW2 API to collect prices of several items in order to determine if crafting and
 planting Pouches in your [Garden Plot](https://wiki.guildwars2.com/wiki/Garden_plot) could be a lucrative business.
@@ -14,7 +14,7 @@ Run and install using Python 3.6 and above.
 2. Setup the Python virtual environment `$ python -m venv venv`
 3. Activate the virtual environment
     - Windows: `$ venv\Scripts\activate.bat` 
-    - Unix & MacOS: `$ venv btd6bot/bin/activate`
+    - Unix & MacOS: `$ venv venv/bin/activate`
 4. Install requirements: `$ pip install -r requirements.txt`
 
 ## Run
