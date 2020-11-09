@@ -37,21 +37,30 @@ def main():
 
     # Find most profitable seed
     seeds = collect_seed_prices()
-    profitable_seed = None
-    profit_seed = 0
+    most_profitable_seed = None
+    most_profit_seed = 0
+    logging.info('---')
     for seed in seeds:
-        print(f'{seed.harvest_price} * {config.TP_TAX} - {seed.seed_price} - {enriched_compost_price}')
         profit = seed.harvest_price * config.TP_TAX - seed.seed_price - enriched_compost_price
-        logging.info(str(seed) + ' = ' + str(profit))
-        if profit_seed < profit:
-            profit_seed = profit
-            profitable_seed = seed
-
-    print(profitable_seed)
-
+        logging.info(f'The profit of crafting a {seed.pouch_name} and growing it to a {seed.seed_name} is'
+                     f' {config.format_coins(profit)}')
+        if most_profit_seed < profit:
+            most_profit_seed = profit
+            most_profitable_seed = seed
+    if most_profitable_seed:
+        logging.info(
+            f'The most profitable Pouch is thus {most_profitable_seed.pouch_name}'
+            f' ({config.format_coins(most_profit_seed)})')
+    else:
+        logging.info(f'By Ogden\'s hammer, what savings. Sadly, there is no money to be made here.')
 
 
 def collect_material_prices():
+    """
+    Read the materials.csv list; for each material collect the current price and return a list of CraftingMaterial
+    objects
+    :return: list of CraftingMaterials
+    """
     # with timebudget("Collecting material prices"):
     commerce = Commerce()
     materials = []
@@ -67,8 +76,13 @@ def collect_material_prices():
 
 
 def find_cheapest_nourishments(material_all_prices):
-    cheapest = [[None, 999999, None, 999999], [None, 999999, None, 999999], [None, 999999, None, 999999],
-                [None, 999999, None, 999999]]
+    """
+    For each rarity, return the cheapest consumable to salvage in order to gain nourishments :param
+    material_all_prices: 2D list where each inner list represents the price of a consumable to be salvaged in order to
+    get a single nourishment
+    :return: 2D list where each inner list represents the cheapest material to salvage to get a single nourishment
+    """
+    cheapest = [[None, 999999, None, 999999] for _ in range(4)]
     for i, material_price in enumerate(material_all_prices):
         for j, prices in enumerate(material_price):
             if all(prices):
@@ -82,6 +96,10 @@ def find_cheapest_nourishments(material_all_prices):
 
 
 def collect_seed_prices():
+    """
+    Read the seeds.csv list; for each material collect the current price and return a list of Seed objects
+    :return: list of Seeds
+    """
     seeds = []
     commerce = Commerce()
     with open('seeds.csv', 'r') as seed_list:
@@ -98,7 +116,8 @@ def collect_seed_prices():
 
 def log_cheapest_materials(index, materials, cheapest_nourishments):
     logging.info(
-        f'Cheapest {RARITIES[index]}:\t{materials[cheapest_nourishments[index][2]].name} for {config.format_coins(cheapest_nourishments[index][3])} each')
+        f'Cheapest {RARITIES[index]}:\t{materials[cheapest_nourishments[index][2]].name}'
+        f' for {config.format_coins(cheapest_nourishments[index][3])} each')
 
 
 if __name__ == '__main__':

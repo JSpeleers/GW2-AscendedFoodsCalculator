@@ -18,9 +18,9 @@ class Commerce:
         :return: list of dicts representing the JSON response of the API
         """
         all_prices = []
-        # Call the API for each 200 IDs, then merge responses
+        # Call the API for each 200 IDs, then merge responses (API limitations)
         for i in range(0, int(len(self.ids) / self.MAX_API_IDS) + 1):
             all_prices.extend(
                 json.loads(requests.get('https://api.guildwars2.com/v2/commerce/prices?ids={}'.format(
-                    str(self.ids[i * self.MAX_API_IDS: (i + 1) * self.MAX_API_IDS])[1:-1] .replace(" ", "").replace("'", ""))).content))
+                    str(self.ids[i * self.MAX_API_IDS: (i + 1) * self.MAX_API_IDS])[1:-1].replace(" ", "").replace("'", ""))).content))
         return all_prices
